@@ -21,6 +21,7 @@
 		A11E65031AB1C68B00591616 /* NetData.swift in Sources */ = {isa = PBXBuildFile; fileRef = A11E64FC1AB1C68B00591616 /* NetData.swift */; };
 		A11E65041AB1C68B00591616 /* Net.swift in Sources */ = {isa = PBXBuildFile; fileRef = A11E64FD1AB1C68B00591616 /* Net.swift */; };
 		A11E65061AB1C69300591616 /* GCD.swift in Sources */ = {isa = PBXBuildFile; fileRef = A11E65051AB1C69300591616 /* GCD.swift */; };
+		A11E65081AB6FBDD00591616 /* ParameterParser.swift in Sources */ = {isa = PBXBuildFile; fileRef = A11E65071AB6FBDD00591616 /* ParameterParser.swift */; };
 		CE1BDD9119BD376F00AFB1ED /* tos_beep.caf in Resources */ = {isa = PBXBuildFile; fileRef = CE1BDD9019BD376F00AFB1ED /* tos_beep.caf */; };
 /* End PBXBuildFile section */
 
@@ -53,6 +54,7 @@
 		A11E64FC1AB1C68B00591616 /* NetData.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NetData.swift; sourceTree = "<group>"; };
 		A11E64FD1AB1C68B00591616 /* Net.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Net.swift; sourceTree = "<group>"; };
 		A11E65051AB1C69300591616 /* GCD.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = GCD.swift; sourceTree = "<group>"; };
+		A11E65071AB6FBDD00591616 /* ParameterParser.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ParameterParser.swift; sourceTree = "<group>"; };
 		CE1BDD9019BD376F00AFB1ED /* tos_beep.caf */ = {isa = PBXFileReference; lastKnownFileType = file; path = tos_beep.caf; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -97,6 +99,7 @@
 		448D893819632D6E006ADF78 /* iBeaconTemplateSwift */ = {
 			isa = PBXGroup;
 			children = (
+				A11E65071AB6FBDD00591616 /* ParameterParser.swift */,
 				448D893B19632D6E006ADF78 /* AppDelegate.swift */,
 				A11E65051AB1C69300591616 /* GCD.swift */,
 				A11E64F71AB1C68B00591616 /* NetUploadTask.swift */,
@@ -250,6 +253,7 @@
 				A11E65031AB1C68B00591616 /* NetData.swift in Sources */,
 				448D893E19632D6E006ADF78 /* ViewController.swift in Sources */,
 				A11E65021AB1C68B00591616 /* NetDownloadTask.swift in Sources */,
+				A11E65081AB6FBDD00591616 /* ParameterParser.swift in Sources */,
 				A11E65001AB1C68B00591616 /* NetRequestSerialization.swift in Sources */,
 				A11E64FE1AB1C68B00591616 /* NetUploadTask.swift in Sources */,
 				448D893C19632D6E006ADF78 /* AppDelegate.swift in Sources */,

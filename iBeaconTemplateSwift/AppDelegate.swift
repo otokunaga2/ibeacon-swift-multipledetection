@@ -92,11 +92,41 @@ extension AppDelegate: CLLocationManagerDelegate {
 		
         UIApplication.sharedApplication().scheduleLocalNotification(notification)
     }
-    func getAsyncRequestToHost(){
+    func sendSimpleRequest(url: String, parameters: [String: AnyObject])-> Void{
+        let parameterString = parameters.stringFromHttpParameters()
+        let requestURL = NSURL(string:"\(url)?\(parameterString)")!
+        
+        var request = NSMutableURLRequest(URL: requestURL)
+        request.HTTPMethod = "GET"
+        
+        let session = NSURLSession.sharedSession()
+        let task = session.dataTaskWithRequest(request, completionHandler: {(data:NSData!,response: NSURLResponse!, error: NSError!) -> Void in
+            switch (data, response, error) {
+            case (_, _, .Some(error)):
+                // エラー処理
+                println(error.localizedDescription)
+            case (.Some(data), .Some(response), _):
+                if (response as NSHTTPURLResponse).statusCode == 200 {
+                    // なんか処理
+                    var error: NSError?
+                    let jsonArray = NSJSONSerialization.JSONObjectWithData(data, options: .AllowFragments, error: &error) as NSArray
+                    println(jsonArray)
+                } else {
+                    // 処理
+                }
+            default:
+                break
+            }
+          })
+        
+        task.resume()
+    }
+    func getAsyncRequestToHost(bodyData2:NSString){
         var myURL:NSURL = NSURL(string: "http://192.168.100.177:8080/BeaconStationController/webapi/myresource?")!
        // var myRequest:NSURLRequest = NSURLRequest(URL: myURL)
-        var bodyData = "date=2015-04-16%2017:54&uuid=DFE7A87B-F80B-1801-BF45-001C4D79EA56&major=1&minro=2&rssi=-71&stationid=1&proximity=mecha"
-        myRequest.HTTPBody = bodyData.dataUsingEocoding(NSUTF8StringEncoding)
+        var myRequest:NSMutableURLRequest = NSMutableURLRequest(URL: myURL)
+        //var bodyData:NSString = "date=2015-04-16%2017:54&uuid=DFE7A87B-F80B-1801-BF45-001C4D79EA56&major=1&minro=2&rssi=-71&stationid=1&proximity=mecha"
+        myRequest.HTTPBody = bodyData2.dataUsingEncoding(NSUTF8StringEncoding)
         NSURLConnection.sendAsynchronousRequest(myRequest, queue: NSOperationQueue.mainQueue(),completionHandler:
             { (response: NSURLResponse!, data: NSData!, error: NSError!) -> Void in
             switch (data, response, error) {
@@ -120,25 +150,6 @@ extension AppDelegate: CLLocationManagerDelegate {
         })
         
     }
-                /* Your code */
-      /*      switch (data, response, error) {
-            case (_, _, .Some(error)):
-            // エラー処理
-            println(error.localizedDescription)
-            case (.Some(data), .Some(response), _):
-            if (response as NSHTTPURLResponse).statusCode == 200 {
-            // なんか処理
-            var error: NSError?
-            let jsonArray = NSJSONSerialization.JSONObjectWithData(data, options: .AllowFragments, error: &error) as NSArray
-            println(jsonArray)
-            } else {
-            // 処理
-            }
-            default:
-            break
-        }
-    task.resume()
-    }*/
     func getHttp(res:NSURLResponse?,data:NSData?,error:NSError?){
         
         // 帰ってきたデータを文字列に変換.
@@ -189,9 +200,16 @@ extension AppDelegate: CLLocationManagerDelegate {
             if(beacons.count > 0) {
                 println("hi")
                 let nearestBeacon:CLBeacon = beacons[0] as CLBeacon
-             /*      var detailLabel: [String: AnyObject] =
-              [
-                    "uuid":  "",
+                //var beacon_parameter:NSString = "?uuid="+"tokunaga&"+"rid=1"+"date="+now
+                var beaconurl = "http://192.168.100.177:8080/BeaconStationController/webapi/myresource"
+                let dateFormatter = NSDateFormatter()
+                var proximityLabel = ""
+                //"&major="+(nearestBeacon.major.stringValue)+"&minor=" + (nearestBeacon.minor.stringValue)
+                let now = NSDate() // 現在日時の取得
+                dateFormatter.dateFormat = "yyyy-MM-dd HH:mm:ss" // 日付フォーマットの設定
+                dateFormatter.locale = NSLocale(localeIdentifier: "jp_JP") // ロケールの設定
+                var detailParameters: [String: AnyObject] =
+                [  "uuid":  "",
                     "rid": 1,
                     "date": dateFormatter.stringFromDate(now) as AnyObject!,
                     "major": nearestBeacon.major.integerValue as AnyObject!,
@@ -199,7 +217,7 @@ extension AppDelegate: CLLocationManagerDelegate {
                     "proximity": proximityLabel as AnyObject!,
                     "rssi": nearestBeacon.rssi as AnyObject!,
                     "accuracy": nearestBeacon.accuracy as AnyObject!
-                ]*/
+                ]
             
                /*
               [
@@ -226,12 +244,13 @@ extension AppDelegate: CLLocationManagerDelegate {
                     println("far")
                 case CLProximity.Near:
                     //requestGet(beacon_uuid!,locationId: "ima")
-                   getRandom()
-                   getAsyncRequestToHost()
+                   //getAsyncRequestToHost(beacon_parameter)
+                    println("near")
                 case CLProximity.Immediate:
                     //requestGet(beacon_uuid!,locationId: "ima")
                     println("imeediate")
-                    getAsyncRequestToHost()
+                    //getAsyncRequestToHost(beacon_parameter)
+                    sendSimpleRequest(beaconurl,parameters: detailParameters)
                      /*HTTPGet("http://www.google.com") {
                         (data: String, error: String?) -> Void in
                         if error != nil {
@@ -357,6 +376,14 @@ extension AppDelegate: CLLocationManagerDelegate {
     }*/
     
     
+    func getCurrentTime()-> String{
+            let now = NSDate() // 現在日時の取得
+            let dateFormatter = NSDateFormatter()
+            dateFormatter.dateFormat = "yyyy-MM-dd HH:mm:ss" // 日付フォーマットの設定
+            dateFormatter.locale = NSLocale(localeIdentifier: "jp_JP") // ロケールの設定
+            NSLog("didRangeBeacons");
+            return dateFormatter.stringFromDate(now)
+    }
     
     func postAsync(params:[String: AnyObject],
         urlString: NSString) {
@@ -384,4 +411,44 @@ extension AppDelegate: CLLocationManagerDelegate {
     }
 
 }
+extension String {
+    
+    /// Percent escape value to be added to a URL query value as specified in RFC 3986
+    ///
+    /// This percent-escapes all characters besize the alphanumeric character set and "-", ".", "_", and "~".
+    ///
+    /// http://www.ietf.org/rfc/rfc3986.txt
+    ///
+    /// :returns: Return precent escaped string.
+    
+    func stringByAddingPercentEncodingForURLQueryValue() -> String? {
+        let characterSet = NSMutableCharacterSet.alphanumericCharacterSet()
+        characterSet.addCharactersInString("-._~")
+        
+        return self.stringByAddingPercentEncodingWithAllowedCharacters(characterSet)
+    }
+    
+}
 
+extension Dictionary {
+    
+    /// Build string representation of HTTP parameter dictionary of keys and objects
+    ///
+    /// This percent escapes in compliance with RFC 3986
+    ///
+    /// http://www.ietf.org/rfc/rfc3986.txt
+    ///
+    /// :returns: String representation in the form of key1=value1&key2=value2 where the keys and values are percent escaped
+    
+    func stringFromHttpParameters() -> String {
+        var parameterArray = [String]()
+        for (key, value) in self {
+            let percentEscapedKey = (key as String).stringByAddingPercentEncodingForURLQueryValue()
+            let percentEscapedValue = (value as String).stringByAddingPercentEncodingForURLQueryValue()
+            parameterArray.append("\(percentEscapedKey!)=\(percentEscapedValue!)")
+        }
+        
+        return join("&", parameterArray)
+    }
+    
+}
