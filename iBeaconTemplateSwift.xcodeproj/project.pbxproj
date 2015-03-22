@@ -22,6 +22,7 @@
 		A11E65041AB1C68B00591616 /* Net.swift in Sources */ = {isa = PBXBuildFile; fileRef = A11E64FD1AB1C68B00591616 /* Net.swift */; };
 		A11E65061AB1C69300591616 /* GCD.swift in Sources */ = {isa = PBXBuildFile; fileRef = A11E65051AB1C69300591616 /* GCD.swift */; };
 		A11E65081AB6FBDD00591616 /* ParameterParser.swift in Sources */ = {isa = PBXBuildFile; fileRef = A11E65071AB6FBDD00591616 /* ParameterParser.swift */; };
+		A11E650A1ABE845600591616 /* json.swift in Sources */ = {isa = PBXBuildFile; fileRef = A11E65091ABE845600591616 /* json.swift */; };
 		CE1BDD9119BD376F00AFB1ED /* tos_beep.caf in Resources */ = {isa = PBXBuildFile; fileRef = CE1BDD9019BD376F00AFB1ED /* tos_beep.caf */; };
 /* End PBXBuildFile section */
 
@@ -55,6 +56,7 @@
 		A11E64FD1AB1C68B00591616 /* Net.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Net.swift; sourceTree = "<group>"; };
 		A11E65051AB1C69300591616 /* GCD.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = GCD.swift; sourceTree = "<group>"; };
 		A11E65071AB6FBDD00591616 /* ParameterParser.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ParameterParser.swift; sourceTree = "<group>"; };
+		A11E65091ABE845600591616 /* json.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = json.swift; path = "../../../swift_lib/swift-json/json/json.swift"; sourceTree = "<group>"; };
 		CE1BDD9019BD376F00AFB1ED /* tos_beep.caf */ = {isa = PBXFileReference; lastKnownFileType = file; path = tos_beep.caf; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -103,6 +105,7 @@
 				448D893B19632D6E006ADF78 /* AppDelegate.swift */,
 				A11E65051AB1C69300591616 /* GCD.swift */,
 				A11E64F71AB1C68B00591616 /* NetUploadTask.swift */,
+				A11E65091ABE845600591616 /* json.swift */,
 				A11E64F81AB1C68B00591616 /* NetResponseData.swift */,
 				A11E64F91AB1C68B00591616 /* NetRequestSerialization.swift */,
 				A11E64FA1AB1C68B00591616 /* NetHelper.swift */,
@@ -259,6 +262,7 @@
 				448D893C19632D6E006ADF78 /* AppDelegate.swift in Sources */,
 				A11E65041AB1C68B00591616 /* Net.swift in Sources */,
 				A11E65011AB1C68B00591616 /* NetHelper.swift in Sources */,
+				A11E650A1ABE845600591616 /* json.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

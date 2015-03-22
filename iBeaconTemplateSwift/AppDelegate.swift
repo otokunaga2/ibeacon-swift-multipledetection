@@ -208,28 +208,7 @@ extension AppDelegate: CLLocationManagerDelegate {
                 let now = NSDate() // 現在日時の取得
                 dateFormatter.dateFormat = "yyyy-MM-dd HH:mm:ss" // 日付フォーマットの設定
                 dateFormatter.locale = NSLocale(localeIdentifier: "jp_JP") // ロケールの設定
-                var detailParameters: [String: AnyObject] =
-                [  "uuid":  "",
-                    "rid": 1,
-                    "date": dateFormatter.stringFromDate(now) as AnyObject!,
-                    "major": nearestBeacon.major.integerValue as AnyObject!,
-                    "minor": nearestBeacon.minor.integerValue as AnyObject!,
-                    "proximity": proximityLabel as AnyObject!,
-                    "rssi": nearestBeacon.rssi as AnyObject!,
-                    "accuracy": nearestBeacon.accuracy as AnyObject!
-                ]
             
-               /*
-              [
-                    "uuid": nearestBeacon.proximityUUID.UUIDString as AnyObject!,
-                    "rid": 1,
-                    "date": dateFormatter.stringFromDate(now) as AnyObject!,
-                    "major": nearestBeacon.major.integerValue as AnyObject!,
-                    "minor": nearestBeacon.minor.integerValue as AnyObject!,
-                    "proximity": proximityLabel as AnyObject!,
-                    "rssi": nearestBeacon.rssi as AnyObject!,
-                    "accuracy": nearestBeacon.accuracy as AnyObject!
-                ]*/
             
                 if(nearestBeacon.proximity == lastProximity ||
                     nearestBeacon.proximity == CLProximity.Unknown) {
@@ -238,19 +217,21 @@ extension AppDelegate: CLLocationManagerDelegate {
                 lastProximity = nearestBeacon.proximity;
                 
                 var beacon_uuid:NSString? = nearestBeacon.proximityUUID.UUIDString as NSString
-                
+                var proximity_label:NSString
                 switch nearestBeacon.proximity {
                 case CLProximity.Far:
-                    println("far")
+                    proximity_label = "far"
                 case CLProximity.Near:
                     //requestGet(beacon_uuid!,locationId: "ima")
                    //getAsyncRequestToHost(beacon_parameter)
                     println("near")
+                    proximity_label = "near"
                 case CLProximity.Immediate:
+                    println("immediate")
+                    proximity_label = "immediate"
                     //requestGet(beacon_uuid!,locationId: "ima")
-                    println("imeediate")
                     //getAsyncRequestToHost(beacon_parameter)
-                    sendSimpleRequest(beaconurl,parameters: detailParameters)
+                    //sendSimpleRequest(beaconurl,parameters: detailParameters)
                      /*HTTPGet("http://www.google.com") {
                         (data: String, error: String?) -> Void in
                         if error != nil {
@@ -262,6 +243,32 @@ extension AppDelegate: CLLocationManagerDelegate {
                 case CLProximity.Unknown:
                     return
                 }
+                var detailLabel: [String: AnyObject] =
+                [
+                    "uuid": nearestBeacon.proximityUUID.UUIDString as AnyObject!,
+                    "rid": 1,
+                    "date": dateFormatter.stringFromDate(now) as AnyObject!,
+                    "major": nearestBeacon.major.integerValue as AnyObject!,
+                    "minor": nearestBeacon.minor.integerValue as AnyObject!,
+                    "proximity": proximity_label as NSString,
+                    "rssi": nearestBeacon.rssi as AnyObject!,
+                    "accuracy": nearestBeacon.accuracy as AnyObject!,
+                    "stationid":1
+                ]
+                let json = JSON(detailLabel)
+                //let request = NSMutableURLRequest(URL: NSURL(string: "http://192.168.100.103/beaconlogger/myresource/async")!)
+                //                let abbsoluteurl = "http://192.168.100.103:8888/beaconlogger/rest/beacon/consume"
+                //this url send to fluentd for logging data
+                
+                //let post_to_mongo_url : NSString = "http://133.30.159.3:8888/beacon"
+                let post_to_fluent_to_mongo : NSString = "http://192.168.100.108:8888/beaconmonger"
+                //let post_to_tomcat_url : NSString = "http://192.168.100.177:8080/tomcat-jersey-jackson-demo-1.0-SNAPSHOT/service/beacon/postbeacon"
+                let post_rails : NSString = "http://192.168.100.159:3000/currents"
+                if (proximity_label == "near" || proximity_label == "immediate"){
+                    postAsync(detailLabel,urlString: post_rails)
+                }
+                postAsync(detailLabel,urlString: post_to_fluent_to_mongo)
+                
             
                 
             } else {
@@ -275,7 +282,6 @@ extension AppDelegate: CLLocationManagerDelegate {
 				lastProximity = CLProximity.Unknown
             }
 			
-           // NSLog("%@", message)
 			sendLocalNotificationWithMessage(message, playSound: playSound)
     }
     
@@ -299,81 +305,6 @@ extension AppDelegate: CLLocationManagerDelegate {
             sendLocalNotificationWithMessage("You exited the region", playSound: true)
     }
     
-    
-    /*func sendRequest(url: String, parameters: [String: AnyObject]) -> NSURL {
-        let parameterString = parameters.stringFromHttpParameters()
-        let requestURL = NSURL(string:"\(url)?\(parameterString)")!
-        
-        var request = NSMutableURLRequest(URL: requestURL)
-        request.HTTPMethod = "GET"
-        
-        let session = NSURLSession.sharedSession()
-        let task = session.dataTaskWithRequest(request, completionHandler:loadedData)
-        task.resume()
-    }*/
-    
-    
-    func HTTPsendRequest(request: NSMutableURLRequest,
-    callback: (String, String?) -> Void) {
-    let task = NSURLSession.sharedSession().dataTaskWithRequest(
-    request,
-    {
-    data, response, error in
-    if error != nil {
-    callback("", error.localizedDescription)
-    } else {
-    callback(
-    NSString(data: data, encoding: NSUTF8StringEncoding)!,
-    nil
-    )
-    }
-    })
-    
-    task.resume()
-    }
-    func HTTPGet(url: String, callback: (String, String?) -> Void) {
-        var request = NSMutableURLRequest(URL: NSURL(string: url)!)
-        HTTPsendRequest(request, callback)
-    }
-    
-    /*func HTTPsendRequest(request:NSMutableURLRequest, callback: (String, String?) -> Void){
-       let task = NSURLSession.sharedSession().dataTaskWithRequest(
-        request,
-        {
-            data, response, error in
-            if error != nil{
-                callback("", error.localizedDescription)
-            }else{
-                callback(NSString(data:data, encoding: NSUTF8StringEncoding)!,
-                nil
-            )
-            }
-       })
-        task.resume()
-    }*/
-    /*func requestGet(uuid: NSString, locationId: NSString){
-        let net = Net()
-        let dateFormatter = NSDateFormatter()
-        dateFormatter.dateFormat = "yyyy-MM-dd HH:mm:ss" // 日付フォーマットの設定
-        dateFormatter.locale = NSLocale(localeIdentifier: "jp_JP") // ロケールの設定
-        let now = NSDate() // 現在日時の取得
-        var header = "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp"
-        var url = "http://192.168.100.177:8080/BeaconStationController/webapi/myresource"
-       // http://192.168.100.177:8080/BeaconStationController/webapi/myresource?date=2015-04-16%2017:54&uuid=DFE7A87B-F80B-1801-BF45-001C4D79EA56&major=1&minro=2&rssi=-71&stationid=1&proximity=mecha
-        //http://192.168.100.177:8080/BeaconStationController/webapi/myresource?date=2015-04-16%2017:54&uuid=DFE7A87B-F80B-1801-BF45-001C4D79EA56&major=1&minro=2&rssi=-71&stationid=1&proximity=mecha
-        //var url = "http://192.168.100.180:4567/beacon/update/"+uuid+"/"+locationId
-        let params: [String: AnyObject] = ["stationid": 1, "uuid": "DFE7A87B-F80B-1801-BF45-001C4D79EA56", "proximity": "nenene", "rssi" : "-13", "accuracy": 0.56586,"userid":"tokunaga","major":1,"minor":1,"date":dateFormatter.stringFromDate(now) as AnyObject!]
-       // http://192.168.100.177:8080/BeaconStationController/webapi/myresource?date=2015-04-16%2017:54&uuid=DFE7A87B-F80B-1801-BF45-001C4D79EA56&major=1&minro=2&rssi=-71&stationid=1&proximity=mecha
-        
-/*        let params: [String: AnyObject] = ["date": "2014-04-14 17:54:32", "stationid": 1, "uuid": "DFE7A87B-F80B-1801-BF45-001C4D79EA56", "proximity": "nenene", "rssi" : "-13", "accuracy": 0.56586,"userid":"tokunaga"]*/
-        net.GET(absoluteUrl: url, params: params, successHandler: { responseData in
-            let result = responseData.json(error: nil)
-            NSLog("result \(result)")
-            }, failureHandler: { error in
-                NSLog("Error")
-        })
-        
-    }*/
     
     
     func getCurrentTime()-> String{

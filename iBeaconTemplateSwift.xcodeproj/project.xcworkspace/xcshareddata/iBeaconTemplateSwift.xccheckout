@@ -12,6 +12,8 @@
 	<dict>
 		<key>698F84060E14097BC4FB2642054E8E3E8388829C</key>
 		<string>https://github.com/relevante/ibeacon-swift-tutorial.git</string>
+		<key>6A4B31B57E14E5921DD94BCBC053E4A99028AD01</key>
+		<string>https://github.com/dankogai/swift-json.git</string>
 	</dict>
 	<key>IDESourceControlProjectPath</key>
 	<string>iBeaconTemplateSwift.xcodeproj</string>
@@ -19,6 +21,8 @@
 	<dict>
 		<key>698F84060E14097BC4FB2642054E8E3E8388829C</key>
 		<string>../..</string>
+		<key>6A4B31B57E14E5921DD94BCBC053E4A99028AD01</key>
+		<string>../../../../swift_lib/swift-json</string>
 	</dict>
 	<key>IDESourceControlProjectURL</key>
 	<string>https://github.com/relevante/ibeacon-swift-tutorial.git</string>
@@ -35,6 +39,14 @@
 			<string>698F84060E14097BC4FB2642054E8E3E8388829C</string>
 			<key>IDESourceControlWCCName</key>
 			<string>ibeacon-swift-tutorial</string>
+		</dict>
+		<dict>
+			<key>IDESourceControlRepositoryExtensionIdentifierKey</key>
+			<string>public.vcs.git</string>
+			<key>IDESourceControlWCCIdentifierKey</key>
+			<string>6A4B31B57E14E5921DD94BCBC053E4A99028AD01</string>
+			<key>IDESourceControlWCCName</key>
+			<string>swift-json</string>
 		</dict>
 	</array>
 </dict>
