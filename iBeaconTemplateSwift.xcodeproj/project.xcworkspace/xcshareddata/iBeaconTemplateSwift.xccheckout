@@ -22,7 +22,7 @@
 		<key>698F84060E14097BC4FB2642054E8E3E8388829C</key>
 		<string>../..</string>
 		<key>6A4B31B57E14E5921DD94BCBC053E4A99028AD01</key>
-		<string>../../../../swift_lib/swift-json</string>
+		<string>../../../swift_lib/swift-json</string>
 	</dict>
 	<key>IDESourceControlProjectURL</key>
 	<string>https://github.com/relevante/ibeacon-swift-tutorial.git</string>

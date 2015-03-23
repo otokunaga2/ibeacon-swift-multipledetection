@@ -92,7 +92,7 @@ extension AppDelegate: CLLocationManagerDelegate {
 		
         UIApplication.sharedApplication().scheduleLocalNotification(notification)
     }
-    func sendSimpleRequest(url: String, parameters: [String: AnyObject])-> Void{
+    /*func sendSimpleRequest(url: String, parameters: [String: AnyObject])-> Void{
         let parameterString = parameters.stringFromHttpParameters()
         let requestURL = NSURL(string:"\(url)?\(parameterString)")!
         
@@ -120,8 +120,8 @@ extension AppDelegate: CLLocationManagerDelegate {
           })
         
         task.resume()
-    }
-    func getAsyncRequestToHost(bodyData2:NSString){
+    }*/
+    /*func getAsyncRequestToHost(bodyData2:NSString){
         var myURL:NSURL = NSURL(string: "http://192.168.100.177:8080/BeaconStationController/webapi/myresource?")!
        // var myRequest:NSURLRequest = NSURLRequest(URL: myURL)
         var myRequest:NSMutableURLRequest = NSMutableURLRequest(URL: myURL)
@@ -149,7 +149,7 @@ extension AppDelegate: CLLocationManagerDelegate {
         
         })
         
-    }
+    }*/
     func getHttp(res:NSURLResponse?,data:NSData?,error:NSError?){
         
         // 帰ってきたデータを文字列に変換.
@@ -201,7 +201,6 @@ extension AppDelegate: CLLocationManagerDelegate {
                 println("hi")
                 let nearestBeacon:CLBeacon = beacons[0] as CLBeacon
                 //var beacon_parameter:NSString = "?uuid="+"tokunaga&"+"rid=1"+"date="+now
-                var beaconurl = "http://192.168.100.177:8080/BeaconStationController/webapi/myresource"
                 let dateFormatter = NSDateFormatter()
                 var proximityLabel = ""
                 //"&major="+(nearestBeacon.major.stringValue)+"&minor=" + (nearestBeacon.minor.stringValue)
@@ -222,24 +221,11 @@ extension AppDelegate: CLLocationManagerDelegate {
                 case CLProximity.Far:
                     proximity_label = "far"
                 case CLProximity.Near:
-                    //requestGet(beacon_uuid!,locationId: "ima")
-                   //getAsyncRequestToHost(beacon_parameter)
                     println("near")
                     proximity_label = "near"
                 case CLProximity.Immediate:
                     println("immediate")
                     proximity_label = "immediate"
-                    //requestGet(beacon_uuid!,locationId: "ima")
-                    //getAsyncRequestToHost(beacon_parameter)
-                    //sendSimpleRequest(beaconurl,parameters: detailParameters)
-                     /*HTTPGet("http://www.google.com") {
-                        (data: String, error: String?) -> Void in
-                        if error != nil {
-                            println(error)
-                        } else {
-                            println(data)
-                        }
-                     }*/
                 case CLProximity.Unknown:
                     return
                 }
@@ -256,18 +242,13 @@ extension AppDelegate: CLLocationManagerDelegate {
                     "stationid":1
                 ]
                 let json = JSON(detailLabel)
-                //let request = NSMutableURLRequest(URL: NSURL(string: "http://192.168.100.103/beaconlogger/myresource/async")!)
-                //                let abbsoluteurl = "http://192.168.100.103:8888/beaconlogger/rest/beacon/consume"
-                //this url send to fluentd for logging data
-                
-                //let post_to_mongo_url : NSString = "http://133.30.159.3:8888/beacon"
                 let post_to_fluent_to_mongo : NSString = "http://192.168.100.108:8888/beaconmonger"
-                //let post_to_tomcat_url : NSString = "http://192.168.100.177:8080/tomcat-jersey-jackson-demo-1.0-SNAPSHOT/service/beacon/postbeacon"
                 let post_rails : NSString = "http://192.168.100.159:3000/currents"
                 if (proximity_label == "near" || proximity_label == "immediate"){
-                    postAsync(detailLabel,urlString: post_rails)
-                }
-                postAsync(detailLabel,urlString: post_to_fluent_to_mongo)
+                    //postAsync(detailLabel,urlString: post_rails)
+                    post(post_rails,params: detailLabel,success)
+                }                              
+                //postAsync(detailLabel,urlString: post_to_fluent_to_mongo)
                 
             
                 
@@ -305,7 +286,13 @@ extension AppDelegate: CLLocationManagerDelegate {
             sendLocalNotificationWithMessage("You exited the region", playSound: true)
     }
     
-    
+    func success(ResponseData: NSString!, error: NSError!){
+        if (error == nil){
+            println("success")
+        }else{
+            println("error")
+        }
+    }
     
     func getCurrentTime()-> String{
             let now = NSDate() // 現在日時の取得
@@ -315,12 +302,27 @@ extension AppDelegate: CLLocationManagerDelegate {
             NSLog("didRangeBeacons");
             return dateFormatter.stringFromDate(now)
     }
-    
+    func post(url: String, params:[String: AnyObject], completionHandler:(responseString: NSString!, error: NSError!) -> ()){
+        var URL: NSURL = NSURL(string: url)!
+        var request:NSMutableURLRequest = NSMutableURLRequest(URL:URL)
+        request.HTTPMethod = "POST"
+        request.addValue("application/json", forHTTPHeaderField: "Content-Type")
+        request.HTTPBody = NSJSONSerialization.dataWithJSONObject(params, options: nil, error: nil)
+        //request.HTTPBody = request.HTTPBody.dataUsingEncoding(NSUTF8StringEncoding)
+        NSURLConnection.sendAsynchronousRequest(request, queue: NSOperationQueue.mainQueue()){
+           response, data, error in
+            var output: NSString!
+            if data != nil{
+                output = NSString(data:data, encoding: NSUTF8StringEncoding)
+            }
+            //completionHandler(responseString: output, error: error)
+        }
+    }
     func postAsync(params:[String: AnyObject],
         urlString: NSString) {
             //let urlString = "http://133.30.159.3:8888/beacon"
             var request = NSMutableURLRequest(URL: NSURL(string: urlString)!)
-            
+            let myUrl:NSURL = NSURL(string: urlString)!
             // set the method(HTTP-POST)
             request.HTTPMethod = "POST"
             // set the header(s)
@@ -329,14 +331,10 @@ extension AppDelegate: CLLocationManagerDelegate {
             request.HTTPBody = NSJSONSerialization.dataWithJSONObject(params, options: nil, error: nil)
             
             // use NSURLSession
-            var task = NSURLSession.sharedSession().dataTaskWithRequest(request, completionHandler: {data, response, error in
-                if (error == nil) {
-                    var result = NSString(data: data, encoding: NSUTF8StringEncoding)!
-                    println(result)
-                } else {
-                    println(error)
-                }
-            })
+            var task = NSURLSession.sharedSession().dataTaskWithRequest(request)
+                    //var result = NSString(data: data, encoding: NSUTF8StringEncoding)!
+                    //println(result)
+                    //println(error)
             task.resume()
             
     }
