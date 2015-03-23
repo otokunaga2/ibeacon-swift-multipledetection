@@ -60,7 +60,7 @@ extension ViewController: UITableViewDataSource {
                 proximityLabel = "Unknown"
             }
             
-            cell!.textLabel.text = "#1" + proximityLabel 
+            cell!.textLabel.text = "#2" + proximityLabel 
                                    
             let detailLabel:String = "Major: \(beacon.major.integerValue), " +
                 "Minor: \(beacon.minor.integerValue), " +

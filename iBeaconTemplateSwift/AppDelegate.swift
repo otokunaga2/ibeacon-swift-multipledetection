@@ -19,12 +19,24 @@ class AppDelegate: UIResponder, UIApplicationDelegate, CLLocationManagerDelegate
 
     func application(application: UIApplication,
         didFinishLaunchingWithOptions launchOptions: NSDictionary?) -> Bool {
-        let uuidString = "DFE7A87B-F80B-1801-BF45-001C4D79EA56"
-        let tktk_uuidString = ""
-        let beaconIdentifier = "iBeaconModules.us"
-        let beaconUUID:NSUUID = NSUUID(UUIDString: uuidString)!
-        let beaconRegion:CLBeaconRegion = CLBeaconRegion(proximityUUID: beaconUUID,
-            identifier: beaconIdentifier)
+        let uuidStringList:Array<NSString> = ["DFE7A87B-F80B-1801-BF45-001C4D79EA56","D2D4C07E-F80B-1801-B452-001C4DB02A1F"]
+        let beaconIdentifierList:Array<NSString> = ["beaconUSB.jp","pen.cs.kobe-u.jp"]
+        //let beaconUUID:NSUUID = NSUUID(UUIDString: uuidString)!
+        //let beaconUUID2:NSUUID = NSUUID(UUIDString: uuidString)!
+         var beaconUUID:Array<NSUUID> = [NSUUID]()
+        for(var i=0;i<uuidStringList.count;i++){
+            var temp =  NSUUID(UUIDString: uuidStringList[i])
+            beaconUUID.append(temp!)
+                
+        }
+        var beaconRegion:Array<CLBeaconRegion> = [CLBeaconRegion]()
+        for(var i=0;i<beaconIdentifierList.count; i++){
+            var temp = CLBeaconRegion(proximityUUID: beaconUUID[i], identifier: beaconIdentifierList[i])
+            beaconRegion.append(temp)
+        }
+        /*let beaconRegion:CLBeaconRegion = CLBeaconRegion(proximityUUID: beaconUUID,
+            identifier: beaconIdentifier)*/
+        
         locationManager = CLLocationManager()
 
         if(locationManager!.respondsToSelector("requestAlwaysAuthorization")) {
@@ -34,8 +46,12 @@ class AppDelegate: UIResponder, UIApplicationDelegate, CLLocationManagerDelegate
         locationManager!.delegate = self
         locationManager!.pausesLocationUpdatesAutomatically = false
         
-        locationManager!.startMonitoringForRegion(beaconRegion)
-        locationManager!.startRangingBeaconsInRegion(beaconRegion)
+        /*locationManager!.startMonitoringForRegion(beaconRegion)
+        locationManager!.startRangingBeaconsInRegion(beaconRegion)*/
+        for(var i = 0; i < uuidStringList.count; i++){
+            locationManager!.startMonitoringForRegion(beaconRegion[i])
+            locationManager!.startRangingBeaconsInRegion(beaconRegion[i])
+        }
         locationManager!.startUpdatingLocation()
         locationManager!.requestAlwaysAuthorization() /* バックグラウンドでも動作する */
         if(application.respondsToSelector("registerUserNotificationSettings:")) {
@@ -193,7 +209,7 @@ extension AppDelegate: CLLocationManagerDelegate {
             viewController.beacons = beacons as [CLBeacon]?
             viewController.tableView!.reloadData()
             
-            NSLog("didRangeBeacons");
+            //NSLog("didRangeBeacons");
             var message:String = ""
 			
 			var playSound = false
@@ -221,10 +237,8 @@ extension AppDelegate: CLLocationManagerDelegate {
                 case CLProximity.Far:
                     proximity_label = "far"
                 case CLProximity.Near:
-                    println("near")
                     proximity_label = "near"
                 case CLProximity.Immediate:
-                    println("immediate")
                     proximity_label = "immediate"
                 case CLProximity.Unknown:
                     return
@@ -239,7 +253,7 @@ extension AppDelegate: CLLocationManagerDelegate {
                     "proximity": proximity_label as NSString,
                     "rssi": nearestBeacon.rssi as AnyObject!,
                     "accuracy": nearestBeacon.accuracy as AnyObject!,
-                    "stationid":1
+                    "stationid":2
                 ]
                 let json = JSON(detailLabel)
                 let post_to_fluent_to_mongo : NSString = "http://192.168.100.108:8888/beaconmonger"
@@ -285,14 +299,6 @@ extension AppDelegate: CLLocationManagerDelegate {
             
             NSLog("You exited the region")
             sendLocalNotificationWithMessage("You exited the region", playSound: true)
-    }
-    
-    func success(ResponseData: NSString!, error: NSError!){
-        if (error == nil){
-            println("success")
-        }else{
-            println("error")
-        }
     }
     
     func getCurrentTime()-> String{
