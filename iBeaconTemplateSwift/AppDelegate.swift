@@ -20,6 +20,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate, CLLocationManagerDelegate
     func application(application: UIApplication,
         didFinishLaunchingWithOptions launchOptions: NSDictionary?) -> Bool {
         let uuidString = "DFE7A87B-F80B-1801-BF45-001C4D79EA56"
+        let tktk_uuidString = ""
         let beaconIdentifier = "iBeaconModules.us"
         let beaconUUID:NSUUID = NSUUID(UUIDString: uuidString)!
         let beaconRegion:CLBeaconRegion = CLBeaconRegion(proximityUUID: beaconUUID,
@@ -198,7 +199,6 @@ extension AppDelegate: CLLocationManagerDelegate {
 			var playSound = false
             
             if(beacons.count > 0) {
-                println("hi")
                 let nearestBeacon:CLBeacon = beacons[0] as CLBeacon
                 //var beacon_parameter:NSString = "?uuid="+"tokunaga&"+"rid=1"+"date="+now
                 let dateFormatter = NSDateFormatter()
@@ -246,8 +246,9 @@ extension AppDelegate: CLLocationManagerDelegate {
                 let post_rails : NSString = "http://192.168.100.159:3000/currents"
                 if (proximity_label == "near" || proximity_label == "immediate"){
                     //postAsync(detailLabel,urlString: post_rails)
-                    post(post_rails,params: detailLabel,success)
-                }                              
+                    post(post_rails,params: detailLabel)
+                    
+                }
                 //postAsync(detailLabel,urlString: post_to_fluent_to_mongo)
                 
             
@@ -299,10 +300,9 @@ extension AppDelegate: CLLocationManagerDelegate {
             let dateFormatter = NSDateFormatter()
             dateFormatter.dateFormat = "yyyy-MM-dd HH:mm:ss" // 日付フォーマットの設定
             dateFormatter.locale = NSLocale(localeIdentifier: "jp_JP") // ロケールの設定
-            NSLog("didRangeBeacons");
             return dateFormatter.stringFromDate(now)
     }
-    func post(url: String, params:[String: AnyObject], completionHandler:(responseString: NSString!, error: NSError!) -> ()){
+    func post(url: String, params:[String: AnyObject]){
         var URL: NSURL = NSURL(string: url)!
         var request:NSMutableURLRequest = NSMutableURLRequest(URL:URL)
         request.HTTPMethod = "POST"
@@ -312,11 +312,13 @@ extension AppDelegate: CLLocationManagerDelegate {
         NSURLConnection.sendAsynchronousRequest(request, queue: NSOperationQueue.mainQueue()){
            response, data, error in
             var output: NSString!
-            if data != nil{
-                output = NSString(data:data, encoding: NSUTF8StringEncoding)
+            if error != nil{
+                println("posted")
+                //output = NSString(data:data, encoding: NSUTF8StringEncoding)
             }
             //completionHandler(responseString: output, error: error)
         }
+        
     }
     func postAsync(params:[String: AnyObject],
         urlString: NSString) {
